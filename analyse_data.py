@@ -35,6 +35,11 @@ def plotWordFrequency(excel_file_path, sheet, column, additional_stop_word=None)
     plt.show()
 
 
+additional_stop_word = ['action_outside', 't', 'có', 'nhé', 'ko', 'cho', 'ơi', 'mình', 'này', 'lấy', 'k', 'còn', 'bạn',
+                        'bn', 'tớ', 'thanh', 'm', 'là', '.', 'ah', 'làng', 'dãy', 'đi', 'báo', 'máy', 'châu', 'giúp',
+                        '15', 'ui', 'nhá', 'quây', 'j', 'x', 'bên', 'cái', 'ah', 'luôn', '2', 'nữa', 'số', 'ntnao',
+                        'dchi', 'ơn', 'r', 'km', 'kia', 'trc', '1m32', 'pha', 'góc', 'í', '-', '?', 'sz', 'sợ', 'oki',
+                        '0936875999', '+', 'hình', 'ck', 'alo', 'mấy', 'hộ', 'món', 'kệ', 'cảm', '&', 'ngô', 'bí',
+                        'nhé.', 'hà', 'việt', 'đồ', 'âu', 'thước', '16a7', '1c', 'hả', 'kích']
 plotWordFrequency('conversations.xlsx', '0', 'customer')
-additional_stop_word = ['action_outside']
 plotWordFrequency('conversations.xlsx', '1', 'customer', additional_stop_word)
