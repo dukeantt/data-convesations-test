@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import io
 import matplotlib.pyplot as plt
-
+import re
 excel_file_path = 'conversations.xlsx'
 xls = pd.ExcelFile(excel_file_path)
 
@@ -41,7 +41,7 @@ def plotWordFrequency(sheet, column, plot_title, additional_unnecessary_words=No
     plt.show()
 
 
-additional_unnecessary_words = ['action_outside', 't', 'có', 'nhé', 'ko', 'cho', 'ơi', 'mình', 'này', 'lấy', 'k', 'còn',
+additional_unnecessary_words = ['t', 'có', 'nhé', 'ko', 'cho', 'ơi', 'mình', 'này', 'lấy', 'k', 'còn',
                                 'bạn',
                                 'bn', 'tớ', 'thanh', 'm', 'là', '.', 'ah', 'làng', 'dãy', 'đi', 'báo', 'máy', 'châu',
                                 'giúp',
@@ -84,3 +84,11 @@ def calculateAverageWaitTime(sheet, plot_title, max_time=9999999999):
 
 calculateAverageWaitTime('0', "Customer 1 wait time", 3977)
 calculateAverageWaitTime('1', "Customer 2 wait time", 14291)
+
+
+df = pd.read_excel(xls, '0')
+customermessage = df["customer"]
+# var = df[df['customer'].str.contains("ship")]
+regexp = "[0-9]{1,3} .+, .+, [A-Z]{2} [0-9]{5}"
+x = 0
+# address = re.findall(regexp, var)
