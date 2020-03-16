@@ -7,11 +7,11 @@ excel_file_path = 'conversations.xlsx'
 xls = pd.ExcelFile(excel_file_path)
 
 
-def plotWordFrequency(excel_file_path, sheet, column, plot_title, additional_unnecessary_words=None):
+# Function to visualize word frequency of customers
+def plotWordFrequency(sheet, column, plot_title, additional_unnecessary_words=None):
     if additional_unnecessary_words is None:
         additional_unnecessary_words = []
 
-    # xls = pd.ExcelFile(excel_file_path)
     df = pd.read_excel(xls, sheet)
     df[column] = df[column].str.lower()
     word_count = df.customer.str.split(expand=True).stack().value_counts()
@@ -25,10 +25,10 @@ def plotWordFrequency(excel_file_path, sheet, column, plot_title, additional_unn
                          'lam', 'tam', 'nhat', 'dung', 'mua', 'co', 'ko',
                          'a?',
                          'ko?', 'ok', '1', '2', '3', '4', 'dc', 'ạ?', ]
-    all_stopwords = vn_stopwords + unnecessary_words + additional_unnecessary_words
+    all_unnecessary_words = vn_stopwords + unnecessary_words + additional_unnecessary_words
 
-    # remove stop word from word_count
-    word_count = word_count.drop(all_stopwords, errors='ignore')
+    # remove all unnecessary words from word_count
+    word_count = word_count.drop(all_unnecessary_words, errors='ignore')
     word_count = word_count[word_count > 3]
 
     # word_count.hist()
@@ -53,29 +53,34 @@ additional_unnecessary_words = ['action_outside', 't', 'có', 'nhé', 'ko', 'cho
                                 'bí',
                                 'nhé.', 'hà', 'việt', 'đồ', 'âu', 'thước', '16a7', '1c', 'hả', 'kích']
 #
-plotWordFrequency('conversations.xlsx', '0', 'customer', 'Customer Conversation 1')
-plotWordFrequency('conversations.xlsx', '1', 'customer', 'Customer Conversation 2', additional_unnecessary_words)
+plotWordFrequency('0', 'customer', 'Word Frequency Customer 1 ')
+plotWordFrequency('1', 'customer', 'Word Frequency Customer 2', additional_unnecessary_words)
 
 
-# 3977
-def calculateAverageWaitTime(sheet, max_time=9999999999):
+def calculateAverageWaitTime(sheet, plot_title, max_time=9999999999):
     df = pd.read_excel(xls, sheet)
 
+    # Get stl column dataz
     customer_wait_time = df.loc[df['label'] == "Shop Gấu & Bí Ngô - Đồ dùng Mẹ & Bé cao cấp", 'stl']
-    customer_wait_time = customer_wait_time[customer_wait_time <= max_time]
+    customer_wait_time = customer_wait_time[
+        customer_wait_time <= max_time]  # remove periods that are too big in difference with the rest
     average_wait_time = customer_wait_time.mean()
     average_wait_time = round(average_wait_time, 2)
 
     customer_wait_time_with_date = df.loc[
         df['label'] == "Shop Gấu & Bí Ngô - Đồ dùng Mẹ & Bé cao cấp", ['fixed_time', 'stl']]
-    customer_wait_time_with_date = customer_wait_time_with_date[customer_wait_time_with_date['stl'] <= max_time]
+    customer_wait_time_with_date = customer_wait_time_with_date[
+        customer_wait_time_with_date['stl'] <= max_time]  # remove periods that are too big in difference with the rest
 
-    customer_wait_time_with_date.plot(x='fixed_time', y='stl')
+    # customer_wait_time_with_date.plot(x='fixed_time', y='stl')
+    customer_wait_time_with_date.plot.scatter(x='fixed_time', y='stl', c="DarkBLue")
+    plt.suptitle(plot_title)
     plt.xlabel('Date')
     plt.ylabel('Wait time (seconds)')
-    plt.figtext(.45, .8, "Average Wait Time:" + str(average_wait_time) + "s")
+    plt.figtext(.55, .8, "Average Wait Time:" + str(average_wait_time) + "s")
+    plt.xticks(rotation=35)
     plt.show()
 
 
-calculateAverageWaitTime('0', 3977)
-calculateAverageWaitTime('1', 14291)
+calculateAverageWaitTime('0', "Customer 1 wait time", 3977)
+calculateAverageWaitTime('1', "Customer 2 wait time", 14291)
