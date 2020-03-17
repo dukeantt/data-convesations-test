@@ -1,8 +1,7 @@
 import pandas as pd
-import numpy as np
 import io
 import matplotlib.pyplot as plt
-import re
+
 excel_file_path = 'conversations.xlsx'
 xls = pd.ExcelFile(excel_file_path)
 
@@ -20,6 +19,7 @@ def plotWordFrequency(sheet, column, plot_title, additional_unnecessary_words=No
     with io.open("vn_stopwords.txt", "r", encoding="utf-8") as my_file:
         vn_stopwords = my_file.read()
     vn_stopwords = vn_stopwords.splitlines()
+
     unnecessary_words = ['url', 'u', 'e', 'o', 'a', 'i', 'c', 'b', 'la', 'giup', 'oi', 'gui', 'nhg', 'chi', 'minh',
                          'shop',
                          'lam', 'tam', 'nhat', 'dung', 'mua', 'co', 'ko',
@@ -41,29 +41,14 @@ def plotWordFrequency(sheet, column, plot_title, additional_unnecessary_words=No
     plt.show()
 
 
-additional_unnecessary_words = ['t', 'có', 'nhé', 'ko', 'cho', 'ơi', 'mình', 'này', 'lấy', 'k', 'còn',
-                                'bạn',
-                                'bn', 'tớ', 'thanh', 'm', 'là', '.', 'ah', 'làng', 'dãy', 'đi', 'báo', 'máy', 'châu',
-                                'giúp',
-                                '15', 'ui', 'nhá', 'quây', 'j', 'x', 'bên', 'cái', 'ah', 'luôn', '2', 'nữa', 'số',
-                                'ntnao',
-                                'dchi', 'ơn', 'r', 'km', 'kia', 'trc', '1m32', 'pha', 'góc', 'í', '-', '?', 'sz', 'sợ',
-                                'oki',
-                                '0936875999', '+', 'hình', 'ck', 'alo', 'mấy', 'hộ', 'món', 'kệ', 'cảm', '&', 'ngô',
-                                'bí',
-                                'nhé.', 'hà', 'việt', 'đồ', 'âu', 'thước', '16a7', '1c', 'hả', 'kích']
-#
-plotWordFrequency('0', 'customer', 'Word Frequency Customer 1 ')
-plotWordFrequency('1', 'customer', 'Word Frequency Customer 2', additional_unnecessary_words)
-
-
 def calculateAverageWaitTime(sheet, plot_title, max_time=9999999999):
     df = pd.read_excel(xls, sheet)
 
-    # Get stl column dataz
+    # Get stl column data
     customer_wait_time = df.loc[df['label'] == "Shop Gấu & Bí Ngô - Đồ dùng Mẹ & Bé cao cấp", 'stl']
     customer_wait_time = customer_wait_time[
         customer_wait_time <= max_time]  # remove periods that are too big in difference with the rest
+
     average_wait_time = customer_wait_time.mean()
     average_wait_time = round(average_wait_time, 2)
 
@@ -82,13 +67,21 @@ def calculateAverageWaitTime(sheet, plot_title, max_time=9999999999):
     plt.show()
 
 
+additional_unnecessary_words = ['t', 'có', 'nhé', 'ko', 'cho', 'ơi', 'mình', 'này', 'lấy', 'k', 'còn',
+                                'bạn',
+                                'bn', 'tớ', 'thanh', 'm', 'là', '.', 'ah', 'làng', 'dãy', 'đi', 'báo', 'máy', 'châu',
+                                'giúp',
+                                '15', 'ui', 'nhá', 'quây', 'j', 'x', 'bên', 'cái', 'ah', 'luôn', '2', 'nữa', 'số',
+                                'ntnao',
+                                'dchi', 'ơn', 'r', 'km', 'kia', 'trc', '1m32', 'pha', 'góc', 'í', '-', '?', 'sz', 'sợ',
+                                'oki',
+                                '0936875999', '+', 'hình', 'ck', 'alo', 'mấy', 'hộ', 'món', 'kệ', 'cảm', '&', 'ngô',
+                                'bí',
+                                'nhé.', 'hà', 'việt', 'đồ', 'âu', 'thước', '16a7', '1c', 'hả', 'kích']
+#
+plotWordFrequency('0', 'customer', 'Word Frequency Customer 1 ')
+plotWordFrequency('1', 'customer', 'Word Frequency Customer 2', additional_unnecessary_words)
+
+#
 calculateAverageWaitTime('0', "Customer 1 wait time", 3977)
 calculateAverageWaitTime('1', "Customer 2 wait time", 14291)
-
-
-df = pd.read_excel(xls, '0')
-customermessage = df["customer"]
-# var = df[df['customer'].str.contains("ship")]
-regexp = "[0-9]{1,3} .+, .+, [A-Z]{2} [0-9]{5}"
-x = 0
-# address = re.findall(regexp, var)
