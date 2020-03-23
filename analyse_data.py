@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import nltk
 from nltk.util import ngrams
 from nltk import word_tokenize
+from collections import Counter
 
 excel_file_path = 'conversations.xlsx'
 xls = pd.ExcelFile(excel_file_path)
@@ -86,12 +87,20 @@ additional_unnecessary_words = ['t', 'có', 'nhé', 'ko', 'cho', 'ơi', 'mình',
                                 'nhé.', 'hà', 'việt', 'đồ', 'âu', 'thước', '16a7', '1c', 'hả', 'kích']
 
 df = pd.read_excel(xls, '0')
-
-bigram_words = []
+bigram_words_customer = []
+bigram_words_shop = []
 for index, row in df.customer.iteritems():
     if pd.isna(row) == False:
         words = row.split()
-        bigram_words += (list(map(' '.join, zip(words[:-1], words[1:]))))
+        bigram_words_customer += (list(map(' '.join, zip(words[:-1], words[1:]))))
+
+for index, row in df.shop.iteritems():
+    if pd.isna(row) == False:
+        words = row.split()
+        bigram_words_shop += (list(map(' '.join, zip(words[:-1], words[1:]))))
+
+bigram_words_customer_counter = Counter(bigram_words_customer).most_common()
+bigram_words_shop_counter = Counter(bigram_words_shop).most_common()
 
 #
 plotWordFrequency('0', 'customer', 'Word Frequency Customer 1 ')
