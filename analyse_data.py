@@ -1,6 +1,9 @@
 import pandas as pd
 import io
 import matplotlib.pyplot as plt
+import nltk
+from nltk.util import ngrams
+from nltk import word_tokenize
 
 excel_file_path = 'conversations.xlsx'
 xls = pd.ExcelFile(excel_file_path)
@@ -67,6 +70,9 @@ def calculateAverageWaitTime(sheet, plot_title, max_time=9999999999):
     plt.show()
 
 
+# def word_weight():
+
+
 additional_unnecessary_words = ['t', 'có', 'nhé', 'ko', 'cho', 'ơi', 'mình', 'này', 'lấy', 'k', 'còn',
                                 'bạn',
                                 'bn', 'tớ', 'thanh', 'm', 'là', '.', 'ah', 'làng', 'dãy', 'đi', 'báo', 'máy', 'châu',
@@ -78,6 +84,15 @@ additional_unnecessary_words = ['t', 'có', 'nhé', 'ko', 'cho', 'ơi', 'mình',
                                 '0936875999', '+', 'hình', 'ck', 'alo', 'mấy', 'hộ', 'món', 'kệ', 'cảm', '&', 'ngô',
                                 'bí',
                                 'nhé.', 'hà', 'việt', 'đồ', 'âu', 'thước', '16a7', '1c', 'hả', 'kích']
+
+df = pd.read_excel(xls, '0')
+
+bigram_words = []
+for index, row in df.customer.iteritems():
+    if pd.isna(row) == False:
+        words = row.split()
+        bigram_words += (list(map(' '.join, zip(words[:-1], words[1:]))))
+
 #
 plotWordFrequency('0', 'customer', 'Word Frequency Customer 1 ')
 plotWordFrequency('1', 'customer', 'Word Frequency Customer 2', additional_unnecessary_words)
