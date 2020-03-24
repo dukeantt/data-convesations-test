@@ -6,13 +6,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 import plotly.express as px
 
-import matplotlib.pyplot as plt
-import math
-import nltk
-from nltk.util import ngrams
-from nltk import word_tokenize
-from collections import Counter
-
 
 def remove_unnecessary_words(text, all_unnecessary_words):
     text_words = text.split()
@@ -43,24 +36,25 @@ def pre_process():
     return customer_message
 
 
+def tfidf_calculator(count_vectorizer, tfidf_transformer, documents):
+    # calculate term frequency
+    count_vectorizer.fit(documents)
+    vector = count_vectorizer.fit_transform(documents)
+    # pd.DataFrame(vector.toarray(),columns=vectorize.get_feature_names())
+
+    # calculate idf
+    tfidf_transformer.fit(vector)
+
+
 excel_file_path = 'conversations.xlsx'
 xls = pd.ExcelFile(excel_file_path)
 df = pd.read_excel(xls, '0')
-
 customer_message = pre_process()
-
 documents = customer_message.tolist()
 
-# calculate term frequency
 vectorizer = CountVectorizer()
-vectorizer.fit(documents)
-vector = vectorizer.fit_transform(documents)
-# pd.DataFrame(vector.toarray(),columns=vectorize.get_feature_names())
-
-# calculate idf
 tfidf_transformer = TfidfTransformer()
-
-tfidf_transformer.fit(vector)
+tfidf_calculator(vectorizer, tfidf_transformer, documents)
 
 # calculate tf-idf
 all_lines = ''
@@ -76,5 +70,20 @@ tfidf_dataframe = tfidf_dataframe.sort_values(by='tfidf', ascending=False)[['wor
 
 fig = px.bar(tfidf_dataframe, x=tfidf_dataframe['tfidf'], y=tfidf_dataframe['words'],
              color=tfidf_dataframe['tfidf'],
+             orientation='h', height=600)
+fig.show()
+
+bigram_vectorizer = CountVectorizer(ngram_range=(2, 2))
+bigram_tfidf_transformer = TfidfTransformer()
+tfidf_calculator(bigram_vectorizer, bigram_tfidf_transformer, documents)
+bigram_tfidf_vector = bigram_tfidf_transformer.transform(bigram_vectorizer.transform([all_lines]))
+
+bigram_tfidf_dataframe = pd.DataFrame(bigram_tfidf_vector.toarray(), index=['tfidf'])
+bigram_tfidf_dataframe = bigram_tfidf_dataframe.transpose()
+bigram_tfidf_dataframe['words'] = bigram_vectorizer.get_feature_names()
+bigram_tfidf_dataframe = bigram_tfidf_dataframe.sort_values(by='tfidf', ascending=False)[['words', 'tfidf']]
+
+fig = px.bar(bigram_tfidf_dataframe, x=bigram_tfidf_dataframe['tfidf'], y=bigram_tfidf_dataframe['words'],
+             color=bigram_tfidf_dataframe['tfidf'],
              orientation='h', height=600)
 fig.show()
