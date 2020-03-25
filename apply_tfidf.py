@@ -6,6 +6,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 import plotly.express as px
 from datetime import date
+from pandas.api.types import CategoricalDtype
+import plotly.graph_objects as go
 
 
 def remove_unnecessary_words(text, all_unnecessary_words):
@@ -53,6 +55,10 @@ df = pd.read_excel(xls, '0')
 
 date_dict = {}
 time_dict = {}
+morning_dict = {}
+afternoon_dict = {}
+night_dict = {}
+
 week_day = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 for index, value in df['fixed_time'].items():
     day = date(value.year, value.month, value.day).weekday()
@@ -63,20 +69,29 @@ for index, value in df['fixed_time'].items():
 
     hour = value.hour
     if 12 < hour < 18:
-        if 'afternoon' in time_dict:
-            time_dict['afternoon'] += 1
+        # if 'afternoon' in time_dict:
+        if week_day[day] in afternoon_dict:
+            # time_dict['afternoon'] += 1
+            afternoon_dict[week_day[day]] += 1
             continue
-        time_dict['afternoon'] = 1
+        # time_dict['afternoon'] = 1
+        afternoon_dict[week_day[day]] = 1
     elif 18 < hour or hour < 5:
-        if 'night' in time_dict:
-            time_dict['night'] += 1
+        # if 'night' in time_dict:
+        if week_day[day] in night_dict:
+            # time_dict['night'] += 1
+            night_dict[week_day[day]] += 1
             continue
-        time_dict['night'] = 1
+        # time_dict['night'] = 1
+        night_dict[week_day[day]] = 1
     else:
-        if 'morning' in time_dict:
-            time_dict['morning'] += 1
+        # if 'morning' in time_dict:
+        if week_day[day] in morning_dict:
+            # time_dict['morning'] += 1
+            morning_dict[week_day[day]] += 1
             continue
-        time_dict['morning'] = 1
+        # time_dict['morning'] = 1
+        morning_dict[week_day[day]] = 1
 
 customer_message = pre_process()
 documents = customer_message.tolist()
@@ -124,10 +139,23 @@ fig = px.bar(date_df, x=date_df['value'], y=date_df['day'],
              orientation='h', height=300)
 fig.show()
 
-time_df = pd.DataFrame(time_dict.items(), columns=['time', 'value'])
-time_df = time_df.sort_values(by='value')[['time', 'value']]
-fig = px.bar(time_df, x=time_df['value'], y=time_df['time'],
-             color=time_df['value'],
-             orientation='h', height=300)
+morning_df = pd.DataFrame(morning_dict.items(), columns=['day', 'morning_time'])
+afternoon_df = pd.DataFrame(afternoon_dict.items(), columns=['day', 'afternoon_time'])
+night_df = pd.DataFrame(night_dict.items(), columns=['day', 'night_time'])
+# time_df = pd.DataFrame(time_dict.items(), columns=['time', 'value'])
+# time_df = time_df.sort_values(by='value')[['time', 'value']]
+# fig = px.bar(time_df, x=time_df['value'], y=time_df['time'],
+#              color=time_df['value'],
+#              orientation='h', height=300)
+# fig.show()
+combine_df = date_df.join(morning_df.set_index('day'), on='day')
+combine_df = combine_df.join(afternoon_df.set_index('day'), on='day')
+combine_df = combine_df.join(night_df.set_index('day'), on='day')
+
+fig = go.Figure(go.Bar(x=combine_df['day'], y=combine_df['morning_time'], name='Morning'))
+fig.add_trace(go.Bar(x=combine_df['day'], y=combine_df['afternoon_time'], name='Afternoon'))
+fig.add_trace(go.Bar(x=combine_df['day'], y=combine_df['night_time'], name='Night'))
+
+fig.update_layout(barmode='stack', xaxis={'categoryorder': 'category ascending'})
 fig.show()
 x = 0
